@@ -5,45 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Study Radio Ten Codes</title>
     <style>
-        :root { --bg: #0f0f0f; --card: #1a1a1a; --primary: #1a73e8; --accent: #34a853; --danger: #d93025; --text: #e0e0e0; --border: #333; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; }
-        #quiz-container { width: 100%; max-width: 650px; padding: 15px; }
-        
-        #page-title { text-align: center; font-size: 1.8rem; font-weight: 800; margin: 20px 0; color: #fff; }
-
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
-        .tab-btn { padding: 12px 20px; background: none; border: none; color: #888; cursor: pointer; font-weight: bold; font-size: 1rem; }
-        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .mode-btn { width: 100%; padding: 22px; margin: 10px 0; font-size: 1.2rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; color: white; }
-        .btn-code { background: var(--primary); }
-        .btn-meaning { background: var(--accent); }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-        th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.7rem; }
-        td { padding: 12px 10px; border-bottom: 1px solid #222; }
-        .code-col { font-weight: bold; color: #fff; width: 60px; white-space: nowrap; }
-        .stat-val { text-align: center; }
-        .status-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; min-width: 35px; display: inline-block; }
-        .tag-correct { background: #1b5e20; color: #fff; }
-        .tag-wrong { background: #b71c1c; color: #fff; }
-
-        .btn-reset { width: 100%; padding: 15px; background: none; color: #666; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; margin-top: 20px; }
-        
-        #quiz-ui, #stats-screen { display: none; }
-        .progress-container { width: 100%; height: 6px; background: #222; border-radius: 3px; margin-bottom: 25px; }
-        .progress-fill { height: 100%; width: 0%; background: var(--primary); border-radius: 3px; }
-        .display-area { text-align: center; margin-bottom: 30px; min-height: 100px; }
-        .main-term { font-size: 2.2rem; font-weight: 800; color: #fff; line-height: 1.2; }
-        .options { display: grid; gap: 10px; }
-        button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--border); border-radius: 8px; background: #222; color: #fff; text-align: left; cursor: pointer; }
-        .correct { background: #1b5e20 !important; }
-        .wrong { background: #b71c1c !important; }
-        #next-btn { width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; display: none; cursor: pointer; margin-top: 20px; }
-    </style>
+:root { --bg: #0f0f0f; --card: #1a1a1a; --primary: #1a73e8; --accent: #34a853; --danger: #d93025; --text: #e0e0e0; --border: #333; }
+body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; }
+#quiz-container { width: 100%; max-width: 650px; padding: 15px; }
+#page-title { text-align: center; font-size: 1.8rem; font-weight: 800; margin: 20px 0; color: #fff; }
+.tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+.tab-btn { padding: 12px 20px; background: none; border: none; color: #888; cursor: pointer; font-weight: bold; font-size: 1rem; }
+.tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+.mode-btn { width: 100%; padding: 22px; margin: 10px 0; font-size: 1.2rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; color: white; }
+.btn-code { background: var(--primary); }
+.btn-meaning { background: var(--accent); }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.7rem; }
+td { padding: 12px 10px; border-bottom: 1px solid #222; }
+.code-col { font-weight: bold; color: #fff; width: 60px; white-space: nowrap; }
+.stat-val { text-align: center; }
+.status-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; min-width: 35px; display: inline-block; }
+.tag-correct { background: #1b5e20; color: #fff; }
+.tag-wrong { background: #b71c1c; color: #fff; }
+.btn-reset { width: 100%; padding: 15px; background: none; color: #666; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; margin-top: 20px; }
+#quiz-ui, #stats-screen { display: none; }
+.progress-container { width: 100%; height: 6px; background: #222; border-radius: 3px; margin-bottom: 25px; }
+.progress-fill { height: 100%; width: 0%; background: var(--primary); border-radius: 3px; }
+.display-area { text-align: center; margin-bottom: 30px; min-height: 100px; }
+.main-term { font-size: 2.2rem; font-weight: 800; color: #fff; line-height: 1.2; }
+.options { display: grid; gap: 10px; }
+button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--border); border-radius: 8px; background: #222; color: #fff; text-align: left; cursor: pointer; }
+.correct { background: #1b5e20 !important; }
+.wrong { background: #b71c1c !important; }
+#next-btn { width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; display: none; cursor: pointer; margin-top: 20px; }
+</style>
 </head>
 <body>
 
@@ -52,13 +46,13 @@
 
     <div id="start-screen">
         <div class="tabs">
-            <button id="tab-drill" class="tab-btn active" onclick="switchTab('drill')">DRILL</button>
-            <button id="tab-study" class="tab-btn" onclick="switchTab('study')">STUDY & STATS</button>
+            <button id="tab-drill" class="tab-btn active" onclick="switchTab(&#39;drill&#39;)">DRILL</button>
+            <button id="tab-study" class="tab-btn" onclick="switchTab(&#39;study&#39;)">STUDY &amp; STATS</button>
         </div>
 
         <div id="drill" class="tab-content active">
-            <button class="mode-btn btn-code" onclick="startQuiz('code')">Code &rarr; Meaning</button>
-            <button class="mode-btn btn-meaning" onclick="startQuiz('meaning')">Meaning &rarr; Code</button>
+            <button class="mode-btn btn-code" onclick="startQuiz(&#39;code&#39;)">Code → Meaning</button>
+            <button class="mode-btn btn-meaning" onclick="startQuiz(&#39;meaning&#39;)">Meaning → Code</button>
         </div>
 
         <div id="study" class="tab-content">
@@ -96,6 +90,13 @@
         </div>
         <button onclick="location.reload()" style="width:100%; padding:20px; background:#333; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Back to Menu</button>
     </div>
+    <div style="text-align: right; margin-top: 40px; padding-bottom: 20px;">
+    <a href="https://www.buymeacoffee.com/doronf" target="_blank">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+             alt="Buy Me A Coffee" 
+             style="height: 50px !important; width: 180px !important;">
+    </a>
+</div>
 </div>
 
 <script>
