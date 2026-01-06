@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Study Radio Ten Codes</title>
+    <style>
+        :root { --bg: #0f0f0f; --card: #1a1a1a; --primary: #1a73e8; --accent: #34a853; --danger: #d93025; --text: #e0e0e0; --border: #333; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; }
+        #quiz-container { width: 100%; max-width: 650px; padding: 15px; }
+        
+        #page-title { text-align: center; font-size: 1.8rem; font-weight: 800; margin: 20px 0; color: #fff; }
+
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+        .tab-btn { padding: 12px 20px; background: none; border: none; color: #888; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .mode-btn { width: 100%; padding: 22px; margin: 10px 0; font-size: 1.2rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; color: white; }
+        .btn-code { background: var(--primary); }
+        .btn-meaning { background: var(--accent); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.7rem; }
+        td { padding: 12px 10px; border-bottom: 1px solid #222; }
+        .code-col { font-weight: bold; color: #fff; width: 60px; white-space: nowrap; }
+        .stat-val { text-align: center; }
+        .status-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; min-width: 35px; display: inline-block; }
+        .tag-correct { background: #1b5e20; color: #fff; }
+        .tag-wrong { background: #b71c1c; color: #fff; }
+
+        .btn-reset { width: 100%; padding: 15px; background: none; color: #666; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; margin-top: 20px; }
+        
+        #quiz-ui, #stats-screen { display: none; }
+        .progress-container { width: 100%; height: 6px; background: #222; border-radius: 3px; margin-bottom: 25px; }
+        .progress-fill { height: 100%; width: 0%; background: var(--primary); border-radius: 3px; }
+        .display-area { text-align: center; margin-bottom: 30px; min-height: 100px; }
+        .main-term { font-size: 2.2rem; font-weight: 800; color: #fff; line-height: 1.2; }
+        .options { display: grid; gap: 10px; }
+        button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--border); border-radius: 8px; background: #222; color: #fff; text-align: left; cursor: pointer; }
+        .correct { background: #1b5e20 !important; }
+        .wrong { background: #b71c1c !important; }
+        #next-btn { width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; display: none; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="page-title">Study Radio Ten Codes</div>
+
+    <div id="start-screen">
+        <div class="tabs">
+            <button id="tab-drill" class="tab-btn active" onclick="switchTab('drill')">DRILL</button>
+            <button id="tab-study" class="tab-btn" onclick="switchTab('study')">STUDY & STATS</button>
+        </div>
+
+        <div id="drill" class="tab-content active">
+            <button class="mode-btn btn-code" onclick="startQuiz('code')">Code &rarr; Meaning</button>
+            <button class="mode-btn btn-meaning" onclick="startQuiz('meaning')">Meaning &rarr; Code</button>
+        </div>
+
+        <div id="study" class="tab-content">
+            <div class="card" style="padding: 10px; overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Meaning</th>
+                            <th class="stat-val">Quizzed</th>
+                            <th class="stat-val">Mastery</th>
+                            <th class="stat-val">Last</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manual-body"></tbody>
+                </table>
+            </div>
+            <button class="btn-reset" onclick="clearData()">RESET ALL DATA</button>
+        </div>
+    </div>
+
+    <div id="quiz-ui">
+        <div class="progress-container"><div id="progress-bar" class="progress-fill"></div></div>
+        <div class="display-area"><div id="target-term" class="main-term"></div></div>
+        <div class="options" id="options-grid"></div>
+        <div id="feedback" style="margin: 15px 0; text-align: center; font-weight: bold;"></div>
+        <button id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <div id="stats-screen">
+        <h1 style="text-align:center;">Session Complete</h1>
+        <div class="card">
+            <div id="session-score" style="font-size: 4rem; font-weight: 800; color: var(--primary);">0%</div>
+            <div id="mistake-count" style="color: #aaa;"></div>
+        </div>
+        <button onclick="location.reload()" style="width:100%; padding:20px; background:#333; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Back to Menu</button>
+    </div>
+</div>
+
+<script>
+const codesData = {"10-0": "Use Caution", "10-1": "Signal Weak", "10-2": "Signal Good", "10-3": "Stop Transmitting", "10-4": "Message Received", "10-5": "Relay", "10-6": "Station is busy", "10-7": "Out Of Service", "10-8": "In Service", "10-9": "Repeat", "10-10": "Fight In Progress", "10-11": "Animal Problem", "10-12": "Stand By", "10-13": "Report Conditions", "10-14": "Prowler Report", "10-15": "Civil Disturbance", "10-16": "Domestic Problem", "10-17": "Meet Complainant", "10-18": "Urgent", "10-19": "Go To Station", "10-20": "Advise To Location", "10-21": "Phone", "10-22": "Disregard", "10-23": "Arrived At Scene", "10-24": "Assignment Complete", "10-25": "Report to", "10-26": "Detaining Suspect", "10-27": "Driver's License Information", "10-28": "Vehicle Registration Information", "10-29": "Check Records For Want", "10-30": "Unauthorized Use Of Radio", "10-31": "Crime In Progress", "10-32": "Person With Gun", "10-33": "Emergency - All Units Stand By", "10-34": "Riot", "10-35": "Major Crime Alert", "10-36": "Correct Time", "10-37": "Suspicious Vehicle", "10-38": "Stop Suspicious Vehicle", "10-39": "Respond With Siren and Flashers", "10-40": "Do not use Siren and Flashers", "10-41": "Beginning Shift", "10-42": "End Shift", "10-43": "Information", "10-44": "Permission to Leave", "10-45": "Dead Animal", "10-46": "Assist Motorist", "10-47": "Emergency Road Repair", "10-48": "Traffic Control", "10-49": "Traffic Signal Out", "10-50": "Traffic Accident", "10-51": "Request Tow Truck", "10-52": "Request Ambulance", "10-53": "Roadway Blocked", "10-54": "Livestock on Roadway", "10-55": "Intoxicated Driver", "10-56": "Intoxicated Pedestrian", "10-57": "Hit and Run Accident", "10-58": "Direct Traffic", "10-59": "Escort", "10-60": "Squad In Vicinity", "10-61": "Personnel In Vicinity", "10-62": "Reply To Message", "10-63": "Prepare to Copy", "10-64": "Local Message", "10-65": "Net Message", "10-66": "Cancel Message", "10-67": "Clear For Net Message", "10-68": "Dispatch Information", "10-69": "Message Received", "10-70": "Fire Alarm", "10-71": "Advise Nature Of Alarm", "10-72": "Report Progress of Alarm", "10-73": "Smoke Report", "10-74": "Negative", "10-75": "In contact with", "10-76": "En route to", "10-77": "Estimated Time of Arrival", "10-78": "Request Assistance", "10-79": "Notify Coroner", "10-80": "Pursuit in Progress", "10-81": "Breathalyser Report", "10-82": "Reserved Lodgings", "10-83": "School Crossing Assignment", "10-84": "Estimated Time of Arrival", "10-85": "Arrival Delayed", "10-86": "Operator On Duty", "10-87": "Pick Up", "10-88": "Advise Telephone Number", "10-89": "Bomb Threat", "10-90": "Bank Alarm", "10-91": "Pick Up Subject", "10-92": "Illegally Parked Vehicle", "10-93": "Blockage", "10-94": "Drag Racing", "10-95": "Subject In Custody", "10-96": "Detain Subject", "10-97": "Test Signal", "10-98": "Prisoner Escape", "10-99": "Wanted Or Stolen"};
+const meaningsData = {}; Object.entries(codesData).forEach(([k,v]) => meaningsData[v] = k);
+
+let questionKeys = [], currentIndex = 0, mistakes = 0, firstTryCorrect = true, isCorrect = false, currentMode = '';
+
+function switchTab(id) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    document.getElementById(id).classList.add('active');
+    if(id === 'study') renderManual();
+}
+
+function renderManual() {
+    const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
+    const tbody = document.getElementById('manual-body');
+    tbody.innerHTML = '';
+    Object.keys(codesData).forEach(code => {
+        const s = stats[code] || { q: 0, r: 0, last: null };
+        const mastery = s.q > 0 ? Math.round((s.r / s.q) * 100) : 0;
+        const lastTag = s.last === 'c' ? '<span class="status-tag tag-correct">COR</span>' : (s.last === 'w' ? '<span class="status-tag tag-wrong">WRG</span>' : '-');
+        tbody.innerHTML += `<tr><td class="code-col">${code}</td><td>${codesData[code]}</td><td class="stat-val">${s.q}</td><td class="stat-val">${mastery}%</td><td class="stat-val">${lastTag}</td></tr>`;
+    });
+}
+
+function startQuiz(mode) {
+    currentMode = mode; mistakes = 0; currentIndex = 0;
+    const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
+    const all = Object.keys(codesData);
+    
+    let neverQuizzed = all.filter(c => !stats[c] || stats[c].q === 0).sort(() => 0.5 - Math.random());
+    let selectedCodes = neverQuizzed.slice(0, 25);
+    
+    if (selectedCodes.length < 25) {
+        const remaining = 25 - selectedCodes.length;
+        const seenPool = all.filter(c => !selectedCodes.includes(c)).sort(() => 0.5 - Math.random());
+        selectedCodes = selectedCodes.concat(seenPool.slice(0, remaining));
+    }
+
+    questionKeys = (mode === 'code') ? selectedCodes : selectedCodes.map(c => codesData[c]);
+    document.getElementById('start-screen').style.display = "none";
+    document.getElementById('page-title').style.display = "none";
+    document.getElementById('quiz-ui').style.display = "block";
+    loadQuestion();
+}
+
+function loadQuestion() {
+    const target = questionKeys[currentIndex];
+    const correctAns = (currentMode === 'code') ? codesData[target] : meaningsData[target];
+    const actualCode = (currentMode === 'code') ? target : correctAns;
+    
+    document.getElementById('target-term').textContent = target;
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('next-btn').style.display = "none";
+    isCorrect = false;
+    firstTryCorrect = true;
+
+    const fullPool = (currentMode === 'code') ? Object.values(codesData) : Object.keys(codesData);
+    const distractors = fullPool.filter(v => v !== correctAns).sort(() => 0.5 - Math.random()).slice(0, 3);
+    const choices = [...distractors, correctAns].sort(() => 0.5 - Math.random());
+
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = "";
+    choices.forEach(c => {
+        const b = document.createElement('button');
+        b.textContent = c; b.className = "option-btn";
+        b.onclick = () => {
+            if(isCorrect) return;
+            const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
+            if(!stats[actualCode]) stats[actualCode] = { q: 0, r: 0, last: null };
+            
+            if(c === correctAns) {
+                isCorrect = true; b.classList.add('correct');
+                stats[actualCode].q++;
+                if(firstTryCorrect) { stats[actualCode].r++; stats[actualCode].last = 'c'; } 
+                else { stats[actualCode].last = 'w'; }
+                localStorage.setItem('codeStats', JSON.stringify(stats));
+                document.getElementById('next-btn').style.display = "block";
+            } else {
+                if(firstTryCorrect) { mistakes++; }
+                firstTryCorrect = false;
+                b.classList.add('wrong');
+                b.disabled = true;
+            }
+        };
+        grid.appendChild(b);
+    });
+}
+
+function nextQuestion() {
+    currentIndex++;
+    document.getElementById('progress-bar').style.width = (currentIndex / 25) * 100 + "%";
+    if(currentIndex < 25) { loadQuestion(); window.scrollTo(0,0); }
+    else {
+        document.getElementById('quiz-ui').style.display = "none";
+        document.getElementById('stats-screen').style.display = "block";
+        document.getElementById('session-score').textContent = Math.round(((25 - mistakes) / 25) * 100) + "%";
+        document.getElementById('mistake-count').textContent = mistakes + " First-Try Mistakes";
+    }
+}
+
+function clearData() { if(confirm("Delete all history and stats?")) { localStorage.clear(); location.reload(); } }
+</script>
+</body>
+</html>
