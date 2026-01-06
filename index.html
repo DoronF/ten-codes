@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Study Radio Ten Codes</title>
+    
+    <title>Interactive Police 10 Codes Trainer | Study Radio Ten Codes</title>
+    <meta name="description" content="A free interactive trainer for police radio ten codes. Practice drills and track your mastery of 10-codes for scanners and emergency services.">
+    <meta name="keywords" content="10 codes, police codes, radio ten codes, police scanner codes, 10-code trainer, radio signals">
+    
     <style>
 :root { --bg: #0f0f0f; --card: #1a1a1a; --primary: #1a73e8; --accent: #34a853; --danger: #d93025; --text: #e0e0e0; --border: #333; }
 body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; }
@@ -46,13 +50,13 @@ button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--bord
 
     <div id="start-screen">
         <div class="tabs">
-            <button id="tab-drill" class="tab-btn active" onclick="switchTab(&#39;drill&#39;)">DRILL</button>
-            <button id="tab-study" class="tab-btn" onclick="switchTab(&#39;study&#39;)">STUDY &amp; STATS</button>
+            <button id="tab-drill" class="tab-btn active" onclick="switchTab('drill')">DRILL</button>
+            <button id="tab-study" class="tab-btn" onclick="switchTab('study')">STUDY &amp; STATS</button>
         </div>
 
         <div id="drill" class="tab-content active">
-            <button class="mode-btn btn-code" onclick="startQuiz(&#39;code&#39;)">Code → Meaning</button>
-            <button class="mode-btn btn-meaning" onclick="startQuiz(&#39;meaning&#39;)">Meaning → Code</button>
+            <button class="mode-btn btn-code" onclick="startQuiz('code')">Code → Meaning</button>
+            <button class="mode-btn btn-meaning" onclick="startQuiz('meaning')">Meaning → Code</button>
         </div>
 
         <div id="study" class="tab-content">
@@ -90,13 +94,14 @@ button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--bord
         </div>
         <button onclick="location.reload()" style="width:100%; padding:20px; background:#333; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Back to Menu</button>
     </div>
-    <div style="text-align: right; margin-top: 40px; padding-bottom: 20px;">
-    <a href="https://www.buymeacoffee.com/doronf" target="_blank">
-        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
-             alt="Buy Me A Coffee" 
-             style="height: 50px !important; width: 180px !important;">
-    </a>
-</div>
+
+    <div id="coffee-button" style="text-align: right; margin-top: 40px; padding-bottom: 20px;">
+        <a href="https://www.buymeacoffee.com/doronf" target="_blank">
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+                 alt="Buy Me A Coffee" 
+                 style="height: 50px !important; width: 180px !important;">
+        </a>
+    </div>
 </div>
 
 <script>
@@ -143,6 +148,7 @@ function startQuiz(mode) {
     document.getElementById('start-screen').style.display = "none";
     document.getElementById('page-title').style.display = "none";
     document.getElementById('quiz-ui').style.display = "block";
+    document.getElementById('coffee-button').style.display = "none"; // HIDE BUTTON
     loadQuestion();
 }
 
@@ -198,6 +204,7 @@ function nextQuestion() {
         document.getElementById('stats-screen').style.display = "block";
         document.getElementById('session-score').textContent = Math.round(((25 - mistakes) / 25) * 100) + "%";
         document.getElementById('mistake-count').textContent = mistakes + " First-Try Mistakes";
+        document.getElementById('coffee-button').style.display = "block"; // SHOW BUTTON AGAIN
     }
 }
 
