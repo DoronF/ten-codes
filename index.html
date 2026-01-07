@@ -50,32 +50,59 @@ button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--bord
 
     <div id="start-screen">
         <div class="tabs">
+            
             <button id="tab-drill" class="tab-btn active" onclick="switchTab('drill')">DRILL</button>
             <button id="tab-study" class="tab-btn" onclick="switchTab('study')">STUDY &amp; STATS</button>
         </div>
 
         <div id="drill" class="tab-content active">
+            <p style="color: #aaa; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">Learn police 10-codes and develop rapid recall and accuracy.</p>
             <button class="mode-btn btn-code" onclick="startQuiz('code')">Code → Meaning</button>
             <button class="mode-btn btn-meaning" onclick="startQuiz('meaning')">Meaning → Code</button>
         </div>
-
-        <div id="study" class="tab-content">
-            <div class="card" style="padding: 10px; overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Meaning</th>
-                            <th class="stat-val">Quizzed</th>
-                            <th class="stat-val">Mastery</th>
-                            <th class="stat-val">Last</th>
-                        </tr>
-                    </thead>
-                    <tbody id="manual-body"></tbody>
-                </table>
+<div id="study" class="tab-content">
+    <div id="study-table-view">
+        
+        
+        <div id="review-section" style="display: block; margin-bottom: 20px;">
+            <h3 style=" font-size: 1rem; font-weight: 600; margin-bottom: 15px; text-transform: uppercase;">Flashcards</h3>
+            <p style="color: #aaa; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;"> Use flashcards to study. Codes with lower Mastry are prioritized.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="mode-btn btn-code" onclick="startFlashcards('code')" style="margin: 0;">Code → Meaning</button>
+                <button class="mode-btn btn-meaning" onclick="startFlashcards('meaning')" style="margin: 0;">Meaning → Code</button>
             </div>
-            <button class="btn-reset" onclick="clearData()">RESET ALL DATA</button>
         </div>
+        <h3>STATS</h3>
+        <p style="color: #aaa; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">Review all 10-codes with quiz performance stats.</p>
+        <div class="card" style="padding: 10px; overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Meaning</th>
+                        <th class="stat-val">Quizzed</th>
+                        <th class="stat-val">Mastery</th>
+                        <th class="stat-val">Last</th>
+                    </tr>
+                </thead>
+                <tbody id="manual-body"></tbody>
+            </table>
+        </div>
+        
+        <button class="btn-reset" onclick="clearData()">RESET ALL DATA</button>
+    </div>
+    
+    <div id="flashcard-view" style="display: none;">
+    <div class="card" onclick="flipFlashcard()" style="min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; text-align: center;">
+        <div id="flashcard-term" class="main-term"></div>
+        <div style="margin-top: 30px; font-size: 0.9rem; color: #666;">Tap to flip</div>
+    </div>
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button onclick="exitFlashcards()" style="flex: 1; padding: 18px; background: #333; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">Done</button>
+        <button onclick="nextFlashcard()" style="flex: 1; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">Next Card</button>
+    </div>
+</div>
+</div>
     </div>
 
     <div id="quiz-ui">
@@ -92,7 +119,7 @@ button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--bord
             <div id="session-score" style="font-size: 4rem; font-weight: 800; color: var(--primary);">0%</div>
             <div id="mistake-count" style="color: #aaa;"></div>
         </div>
-        <button onclick="location.reload()" style="width:100%; padding:20px; background:#333; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Back to Menu</button>
+        <button onclick="location.reload()" style="width:100%; padding:20px; background:#333; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Done</button>
     </div>
 
     <div id="coffee-button" style="text-align: right; margin-top: 40px; padding-bottom: 20px;">
@@ -122,12 +149,82 @@ function renderManual() {
     const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
     const tbody = document.getElementById('manual-body');
     tbody.innerHTML = '';
+    
     Object.keys(codesData).forEach(code => {
         const s = stats[code] || { q: 0, r: 0, last: null };
         const mastery = s.q > 0 ? Math.round((s.r / s.q) * 100) : 0;
         const lastTag = s.last === 'c' ? '<span class="status-tag tag-correct">COR</span>' : (s.last === 'w' ? '<span class="status-tag tag-wrong">WRG</span>' : '-');
         tbody.innerHTML += `<tr><td class="code-col">${code}</td><td>${codesData[code]}</td><td class="stat-val">${s.q}</td><td class="stat-val">${mastery}%</td><td class="stat-val">${lastTag}</td></tr>`;
     });
+}
+
+let flashcardPool = [], flashcardIndex = 0, flashcardFlipped = false, flashcardMode = '';
+
+function startFlashcards(mode) {
+    flashcardMode = mode;
+    const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
+    
+    // Get all codes that have been quizzed
+    const quizzedCodes = Object.keys(codesData).filter(code => {
+        const s = stats[code];
+        return s && s.q > 0;
+    });
+    
+    // If no quizzed codes, use all codes
+    if (quizzedCodes.length === 0) {
+        flashcardPool = Object.keys(codesData).sort(() => 0.5 - Math.random());
+    } else {
+        // Sort by mastery (lowest first) so weak codes are prioritized
+        flashcardPool = quizzedCodes.sort((a, b) => {
+            const masteryA = Math.round((stats[a].r / stats[a].q) * 100);
+            const masteryB = Math.round((stats[b].r / stats[b].q) * 100);
+            return masteryA - masteryB;
+        });
+    }
+    
+    flashcardIndex = 0;
+    document.getElementById('study-table-view').style.display = 'none';
+    document.getElementById('flashcard-view').style.display = 'block';
+    loadFlashcard();
+}
+
+function loadFlashcard() {
+    const code = flashcardPool[flashcardIndex];
+    const meaning = codesData[code];
+    flashcardFlipped = false;
+    
+    // Show code or meaning based on mode
+    const initialTerm = flashcardMode === 'code' ? code : meaning;
+    document.getElementById('flashcard-term').textContent = initialTerm;
+}
+
+function flipFlashcard() {
+    const code = flashcardPool[flashcardIndex];
+    const meaning = codesData[code];
+    flashcardFlipped = !flashcardFlipped;
+    
+    // Flip between code and meaning based on mode
+    if (flashcardMode === 'code') {
+        document.getElementById('flashcard-term').textContent = flashcardFlipped ? meaning : code;
+    } else {
+        document.getElementById('flashcard-term').textContent = flashcardFlipped ? code : meaning;
+    }
+}
+
+function nextFlashcard() {
+    flashcardIndex++;
+    if (flashcardIndex < flashcardPool.length) {
+        loadFlashcard();
+    } else {
+        // Loop back to start
+        flashcardIndex = 0;
+        loadFlashcard();
+    }
+}
+
+function exitFlashcards() {
+    document.getElementById('flashcard-view').style.display = 'none';
+    document.getElementById('study-table-view').style.display = 'block';
 }
 
 function startQuiz(mode) {
