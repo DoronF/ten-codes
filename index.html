@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>Interactive Police 10 Codes Trainer | Study Radio Ten Codes</title>
     <meta name="description" content="A free interactive trainer for police radio ten codes. Practice drills and track your mastery of 10-codes for scanners and emergency services.">
     <meta name="keywords" content="10 codes, police codes, radio ten codes, police scanner codes, 10-code trainer, radio signals">
-    
+
     <style>
 :root { --bg: #0f0f0f; --card: #1a1a1a; --primary: #1a73e8; --accent: #34a853; --danger: #d93025; --text: #e0e0e0; --border: #333; }
 body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; }
@@ -23,7 +26,7 @@ body { font-family: -apple-system, sans-serif; background: var(--bg); color: var
 .btn-code { background: var(--primary); }
 .btn-meaning { background: var(--accent); }
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.7rem; }
+th { text-align: center; color: #888; padding: 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.7rem; }
 td { padding: 12px 10px; border-bottom: 1px solid #222; }
 .code-col { font-weight: bold; color: #fff; width: 60px; white-space: nowrap; }
 .stat-val { text-align: center; }
@@ -41,7 +44,36 @@ button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--bord
 .correct { background: #1b5e20 !important; }
 .wrong { background: #b71c1c !important; }
 #next-btn { width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; display: none; cursor: pointer; margin-top: 20px; }
-</style>
+
+.option-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    text-align: left;
+    animation: fadeInDetails 0.25s ease-out forwards;
+}
+@keyframes fadeInDetails {
+    from { opacity: 0; transform: translateY(-2px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.option-explanation {
+    font-size: 0.9rem;
+    font-weight: normal;
+    color: #e2f0d9;
+    line-height: 1.45;
+    text-align: left;
+}
+.option-example {
+    font-size: 0.85rem;
+    font-weight: normal;
+    color: #b2e2b9;
+    font-style: italic;
+    line-height: 1.4;
+    margin-top: 6px;
+    text-align: left;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -50,9 +82,9 @@ button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--bord
 
     <div id="start-screen">
         <div class="tabs">
-            
             <button id="tab-drill" class="tab-btn active" onclick="switchTab('drill')">DRILL</button>
-            <button id="tab-study" class="tab-btn" onclick="switchTab('study')">STUDY &amp; STATS</button>
+            <button id="tab-study" class="tab-btn" onclick="switchTab('study')">STUDY</button>
+            <button id="tab-stats" class="tab-btn" onclick="switchTab('stats')">STATS</button>
         </div>
 
         <div id="drill" class="tab-content active">
@@ -60,49 +92,81 @@ button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--bord
             <button class="mode-btn btn-code" onclick="startQuiz('code')">Code → Meaning</button>
             <button class="mode-btn btn-meaning" onclick="startQuiz('meaning')">Meaning → Code</button>
         </div>
-<div id="study" class="tab-content">
-    <div id="study-table-view">
-        
-        
-        <div id="review-section" style="display: block; margin-bottom: 20px;">
-            <h3 style=" font-size: 1rem; font-weight: 600; margin-bottom: 15px; text-transform: uppercase;">Flashcards</h3>
-            <p style="color: #aaa; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;"> Use flashcards to study. Codes with lower Mastry are prioritized.</p>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="mode-btn btn-code" onclick="startFlashcards('code')" style="margin: 0;">Code → Meaning</button>
-                <button class="mode-btn btn-meaning" onclick="startFlashcards('meaning')" style="margin: 0;">Meaning → Code</button>
+
+        <div id="study" class="tab-content">
+            <div id="study-table-view">
+                <div id="review-section" style="display: block; margin-bottom: 20px;">
+                    <p style="color: #aaa; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">Use flashcards to study. Codes with lower mastery are prioritized.</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="mode-btn btn-code" onclick="startFlashcards('code')" style="margin: 0;">Code → Meaning</button>
+                        <button class="mode-btn btn-meaning" onclick="startFlashcards('meaning')" style="margin: 0;">Meaning → Code</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="flashcard-view" style="display: none;">
+                <div class="card" onclick="flipFlashcard()" style="min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; text-align: center; padding: 25px 20px;">
+                    <div id="flashcard-term" class="main-term"></div>
+                    <div id="flashcard-details" class="option-details" style="display: none; width: 100%; max-width: 480px; margin-top: 15px; text-align: center;">
+                        <div id="flashcard-explanation" class="option-explanation" style="color: #e0e0e0; text-align: center;"></div>
+                        <div id="flashcard-example" class="option-example" style="color: #aaa; text-align: center;"></div>
+                    </div>
+                    <div style="margin-top: 25px; font-size: 0.85rem; color: #666;" id="flashcard-hint">Tap to flip</div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button onclick="exitFlashcards()" style="flex: 1; padding: 18px; background: #333; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">Done</button>
+                    <button onclick="nextFlashcard()" style="flex: 1; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">Next Card</button>
+                </div>
             </div>
         </div>
-        <h3>STATS</h3>
-        <p style="color: #aaa; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">Review all 10-codes with quiz performance stats.</p>
-        <div class="card" style="padding: 10px; overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Meaning</th>
-                        <th class="stat-val">Quizzed</th>
-                        <th class="stat-val">Mastery</th>
-                        <th class="stat-val">Last</th>
-                    </tr>
-                </thead>
-                <tbody id="manual-body"></tbody>
-            </table>
+
+        <div id="stats" class="tab-content">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+                <div class="card" style="padding: 15px 10px; text-align: center; margin-bottom: 0;">
+                    <div id="stat-total-sessions" style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">0</div>
+                    <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-top: 4px; font-weight: 600;">Drills</div>
+                </div>
+                <div class="card" style="padding: 15px 10px; text-align: center; margin-bottom: 0;">
+                    <div id="stat-avg-score" style="font-size: 1.6rem; font-weight: 800; color: var(--accent);">0%</div>
+                    <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-top: 4px; font-weight: 600;">Avg Accuracy</div>
+                </div>
+                <div class="card" style="padding: 15px 10px; text-align: center; margin-bottom: 0;">
+                    <div id="stat-mastered-codes" style="font-size: 1.6rem; font-weight: 800; color: #ffb74d;">0/100</div>
+                    <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-top: 4px; font-weight: 600;">Mastered</div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 18px; margin-bottom: 20px;">
+                <h3 style="font-size: 0.85rem; font-weight: 700; color: #888; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 0.5px;">Accuracy Over Time</h3>
+                <div style="position: relative; height: 200px;">
+                    <canvas id="progress-chart"></canvas>
+                </div>
+            </div>
+
+            <h3 style="font-size: 0.85rem; font-weight: 700; color: #888; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px;">All Codes</h3>
+            <div class="card" style="padding: 10px; overflow-x: auto; margin-bottom: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">Code</th>
+                            <th style="text-align:left;">Meaning</th>
+                            <th class="stat-val">Quizzed</th>
+                            <th class="stat-val">Mastery</th>
+                            <th class="stat-val">Last</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manual-body"></tbody>
+                </table>
+            </div>
+            <div id="reset-confirm" style="display:none; margin-top: 20px; background: #2a1a1a; border: 1px solid #b71c1c; border-radius: 8px; padding: 14px; text-align: center;">
+                <p style="color: #ff8a80; font-size: 0.9rem; margin: 0 0 12px;">Delete all drill history and stats?</p>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="doReset()" style="flex:1; padding:10px; background:#b71c1c; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Yes, Reset</button>
+                    <button onclick="document.getElementById('reset-confirm').style.display='none'" style="flex:1; padding:10px; background:#333; color:#aaa; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Cancel</button>
+                </div>
+            </div>
+            <button class="btn-reset" onclick="document.getElementById('reset-confirm').style.display='block'">RESET ALL DATA</button>
         </div>
-        
-        <button class="btn-reset" onclick="clearData()">RESET ALL DATA</button>
-    </div>
-    
-    <div id="flashcard-view" style="display: none;">
-    <div class="card" onclick="flipFlashcard()" style="min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; text-align: center;">
-        <div id="flashcard-term" class="main-term"></div>
-        <div style="margin-top: 30px; font-size: 0.9rem; color: #666;">Tap to flip</div>
-    </div>
-    <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button onclick="exitFlashcards()" style="flex: 1; padding: 18px; background: #333; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">Done</button>
-        <button onclick="nextFlashcard()" style="flex: 1; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">Next Card</button>
-    </div>
-</div>
-</div>
     </div>
 
     <div id="quiz-ui">
@@ -124,36 +188,109 @@ button.option-btn { padding: 16px; font-size: 1rem; border: 1px solid var(--bord
 
     <div id="coffee-button" style="text-align: right; margin-top: 40px; padding-bottom: 20px;">
         <a href="https://www.buymeacoffee.com/doronf" target="_blank">
-            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
-                 alt="Buy Me A Coffee" 
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+                 alt="Buy Me A Coffee"
                  style="height: 50px !important; width: 180px !important;">
         </a>
     </div>
 </div>
 
 <script>
-const codesData = {"10-0": "Use Caution", "10-1": "Signal Weak", "10-2": "Signal Good", "10-3": "Stop Transmitting", "10-4": "Message Received", "10-5": "Relay", "10-6": "Station is busy", "10-7": "Out Of Service", "10-8": "In Service", "10-9": "Repeat", "10-10": "Fight In Progress", "10-11": "Animal Problem", "10-12": "Stand By", "10-13": "Report Conditions", "10-14": "Prowler Report", "10-15": "Civil Disturbance", "10-16": "Domestic Problem", "10-17": "Meet Complainant", "10-18": "Urgent", "10-19": "Go To Station", "10-20": "Advise To Location", "10-21": "Phone", "10-22": "Disregard", "10-23": "Arrived At Scene", "10-24": "Assignment Complete", "10-25": "Report to", "10-26": "Detaining Suspect", "10-27": "Driver's License Information", "10-28": "Vehicle Registration Information", "10-29": "Check Records For Want", "10-30": "Unauthorized Use Of Radio", "10-31": "Crime In Progress", "10-32": "Person With Gun", "10-33": "Emergency - All Units Stand By", "10-34": "Riot", "10-35": "Major Crime Alert", "10-36": "Correct Time", "10-37": "Suspicious Vehicle", "10-38": "Stop Suspicious Vehicle", "10-39": "Respond With Siren and Flashers", "10-40": "Do not use Siren and Flashers", "10-41": "Beginning Shift", "10-42": "End Shift", "10-43": "Information", "10-44": "Permission to Leave", "10-45": "Dead Animal", "10-46": "Assist Motorist", "10-47": "Emergency Road Repair", "10-48": "Traffic Control", "10-49": "Traffic Signal Out", "10-50": "Traffic Accident", "10-51": "Request Tow Truck", "10-52": "Request Ambulance", "10-53": "Roadway Blocked", "10-54": "Livestock on Roadway", "10-55": "Intoxicated Driver", "10-56": "Intoxicated Pedestrian", "10-57": "Hit and Run Accident", "10-58": "Direct Traffic", "10-59": "Escort", "10-60": "Squad In Vicinity", "10-61": "Personnel In Vicinity", "10-62": "Reply To Message", "10-63": "Prepare to Copy", "10-64": "Local Message", "10-65": "Net Message", "10-66": "Cancel Message", "10-67": "Clear For Net Message", "10-68": "Dispatch Information", "10-69": "Message Received", "10-70": "Fire Alarm", "10-71": "Advise Nature Of Alarm", "10-72": "Report Progress of Alarm", "10-73": "Smoke Report", "10-74": "Negative", "10-75": "In contact with", "10-76": "En route to", "10-77": "Estimated Time of Arrival", "10-78": "Request Assistance", "10-79": "Notify Coroner", "10-80": "Pursuit in Progress", "10-81": "Breathalyser Report", "10-82": "Reserved Lodgings", "10-83": "School Crossing Assignment", "10-84": "Estimated Time of Arrival", "10-85": "Arrival Delayed", "10-86": "Operator On Duty", "10-87": "Pick Up", "10-88": "Advise Telephone Number", "10-89": "Bomb Threat", "10-90": "Bank Alarm", "10-91": "Pick Up Subject", "10-92": "Illegally Parked Vehicle", "10-93": "Blockage", "10-94": "Drag Racing", "10-95": "Subject In Custody", "10-96": "Detain Subject", "10-97": "Test Signal", "10-98": "Prisoner Escape", "10-99": "Wanted Or Stolen"};
+const codesData = {"10-0": "Use Caution", "10-1": "Signal Weak", "10-2": "Signal Good", "10-3": "Stop Transmitting", "10-4": "Message Received", "10-5": "Relay", "10-6": "Station is Busy", "10-7": "Out Of Service", "10-8": "In Service", "10-9": "Repeat", "10-10": "Fight In Progress", "10-11": "Animal Problem", "10-12": "Stand By", "10-13": "Report Conditions", "10-14": "Prowler Report", "10-15": "Civil Disturbance", "10-16": "Domestic Problem", "10-17": "Meet Complainant", "10-18": "Urgent", "10-19": "Go To Station", "10-20": "Advise Location", "10-21": "Phone", "10-22": "Disregard", "10-23": "Arrived At Scene", "10-24": "Assignment Complete", "10-25": "Report To", "10-26": "Detaining Suspect", "10-27": "Driver's License Info", "10-28": "Vehicle Registration Info", "10-29": "Check Records For Want", "10-30": "Unauthorized Radio Use", "10-31": "Crime In Progress", "10-32": "Person With Gun", "10-33": "Emergency - All Units Stand By", "10-34": "Riot", "10-35": "Major Crime Alert", "10-36": "Correct Time", "10-37": "Suspicious Vehicle", "10-38": "Stop Suspicious Vehicle", "10-39": "Respond With Siren/Flashers", "10-40": "Do Not Use Siren/Flashers", "10-41": "Beginning Shift", "10-42": "End Shift", "10-43": "Information", "10-44": "Permission to Leave", "10-45": "Dead Animal", "10-46": "Assist Motorist", "10-47": "Emergency Road Repair", "10-48": "Traffic Standard Repair", "10-49": "Traffic Signal Out", "10-50": "Traffic Accident", "10-51": "Request Tow Truck", "10-52": "Request Ambulance", "10-53": "Roadway Blocked", "10-54": "Livestock on Roadway", "10-55": "Intoxicated Driver", "10-56": "Intoxicated Pedestrian", "10-57": "Hit and Run Accident", "10-58": "Direct Traffic", "10-59": "Escort", "10-60": "Squad In Vicinity", "10-61": "Personnel In Area", "10-62": "Reply To Message", "10-63": "Prepare to Copy", "10-64": "Local Message", "10-65": "Net Message", "10-66": "Cancel Message", "10-67": "Clear For Net Message", "10-68": "Dispatch Info", "10-69": "Message Received", "10-70": "Fire Alarm", "10-71": "Advise Nature Of Fire", "10-72": "Report Progress of Alarm", "10-73": "Smoke Report", "10-74": "Negative", "10-75": "In Contact With", "10-76": "En Route To", "10-77": "ETA", "10-78": "Request Assistance", "10-79": "Notify Coroner", "10-80": "Pursuit In Progress", "10-81": "Breathalyzer Report", "10-82": "Reserve Lodging", "10-83": "School Crossing Assignment", "10-84": "ETA", "10-85": "Arrival Delayed", "10-86": "Operator On Duty", "10-87": "Pickup/Distribute Checks", "10-88": "Advise Telephone Number", "10-89": "Bomb Threat", "10-90": "Bank Alarm", "10-91": "Pick Up Subject", "10-92": "Illegally Parked Vehicle", "10-93": "Blockade", "10-94": "Drag Racing", "10-95": "Subject In Custody", "10-96": "Mental Subject", "10-97": "Test Signal", "10-98": "Prisoner Escape", "10-99": "Wanted Or Stolen"};
 const meaningsData = {}; Object.entries(codesData).forEach(([k,v]) => meaningsData[v] = k);
+const explanationsData = {"10-0": "Indicates a potentially dangerous situation or subject; proceed with heightened awareness.", "10-1": "Unable to copy the transmission; the signal is weak or hard to hear. Change location.", "10-2": "The radio transmission is clear, strong, and easy to understand.", "10-3": "Instructs units to clear the radio frequency immediately for priority traffic.", "10-4": "Acknowledgment that a transmission was heard and understood.", "10-5": "Pass along a message to another unit, agency, or dispatcher.", "10-6": "The unit or station is currently occupied with another task and unavailable.", "10-7": "Unit is off-duty, unavailable, or taking a break.", "10-8": "Unit is active, available for calls, and on patrol.", "10-9": "Request to repeat the last transmission because it was missed or unclear.", "10-10": "Active physical altercation reported or taking place.", "10-11": "Incident involving an animal (e.g., stray, aggressive, injured, or loose livestock).", "10-12": "Wait for further instructions or hold your current position/transmission.", "10-13": "Request for weather or road condition update in a specific area.", "10-14": "Suspicious person reported skulking or lurking around a property.", "10-15": "Public disorder, crowd problem, or disruptive behavior.", "10-16": "Verbal or physical dispute involving family members or household partners.", "10-17": "Directs a unit to meet the person who reported an incident.", "10-18": "Task or response requires quick action, but not necessarily emergency lights/siren.", "10-19": "Directs a unit to return to the police station or headquarters.", "10-20": "Request or statement of current location/position.", "10-21": "Request to make a phone call to a specific person, unit, or dispatch.", "10-22": "Cancel the previous command, request, or assignment.", "10-23": "Unit has arrived at the location of the incident.", "10-24": "Unit has finished the assigned task and is moving to the next status.", "10-25": "Directs a unit or officer to meet a specific person or report to a location.", "10-26": "Officer has temporarily stopped or held a person of interest.", "10-27": "Request to check or verify driver's license status and details.", "10-28": "Request to check ownership, status, and registration details of a vehicle.", "10-29": "Query to see if a person, vehicle, or item is wanted or listed as stolen.", "10-30": "Notice that someone is using the radio frequency without clearance.", "10-31": "An active crime is currently being committed.", "10-32": "Report or observation of an individual armed with a firearm.", "10-33": "Emergency priority broadcast; clear the channel for life-safety traffic.", "10-34": "Large-scale public disturbance or violent crowd activity.", "10-35": "High-priority broadcast regarding a major crime (e.g., homicide, armed robbery).", "10-36": "Request or statement of the exact official time.", "10-37": "Unfamiliar, improperly parked, or suspicious vehicle reported.", "10-38": "Initiating a traffic stop on a suspicious vehicle.", "10-39": "Emergency response mode (Code 3); use lights and sirens.", "10-40": "Silent approach mode; proceed without lights or sirens to avoid alerting suspects.", "10-41": "Officer is signing on for their duty shift.", "10-42": "Officer is signing off and ending their duty shift.", "10-43": "Passing along general news, details, or situational information.", "10-44": "Requesting authorization to leave a designated post, area, or jurisdiction.", "10-45": "Report of a deceased animal in the roadway or public space.", "10-46": "Stopping to help a stranded or broken-down driver.", "10-47": "Hazardous road defect requiring immediate highway crew attention.", "10-48": "Traffic standard (sign, signal post, or similar fixture) is damaged or needs repair.", "10-49": "Traffic light failure or power outage at an intersection.", "10-50": "Vehicle crash or collision reported.", "10-51": "Dispatch a wrecker/tow truck to tow a vehicle.", "10-52": "Dispatch emergency medical services (EMS) to a location.", "10-53": "An obstacle or crash is completely obstructing traffic.", "10-54": "Cattle, horses, or large farm animals loose on a road.", "10-55": "Suspected drunk or impaired driver (DUI/DWI).", "10-56": "Impaired individual walking in public or near traffic.", "10-57": "Vehicle accident where one or more drivers left the scene without stopping.", "10-58": "Actively guiding traffic flow manually at a specific point.", "10-59": "Accompanying a official, oversized load, or funeral procession.", "10-60": "Patrol units or police squad cars are operating near the area.", "10-61": "Other personnel are in the vicinity of the location.", "10-62": "Requesting an answer or confirmation to a prior transmission.", "10-63": "Warning to get ready to write down incoming text/information.", "10-64": "Broadcast intended for local units or local dispatch channel only.", "10-65": "Broadcast sent out across the broader regional or statewide network.", "10-66": "Rescind or invalidate a previously issued radio message.", "10-67": "Radio frequency is clear and ready for network broadcast.", "10-68": "Information or instructions sent directly from dispatch.", "10-69": "Alternative confirmation code that a transmission was received.", "10-70": "Report of a commercial or residential fire alarm sounding.", "10-71": "Request for clarification on the type or extent of a reported fire.", "10-72": "Request for update on an active fire or alarm incident.", "10-73": "Observation or report of visible smoke in an area.", "10-74": "No, negative response, or incorrect.", "10-75": "Officer has established contact with a suspect, witness, or subject.", "10-76": "Officer is driving/traveling toward a specific location.", "10-77": "Estimated Time of Arrival at destination.", "10-78": "Requesting emergency back-up support from other units.", "10-79": "Request medical examiner or coroner to scene for a deceased person.", "10-80": "Actively pursuing a fleeing suspect or vehicle.", "10-81": "Performing or reporting results of a breath alcohol test.", "10-82": "Arrange or reserve lodging/accommodations.", "10-83": "Assigned to monitor and direct traffic at a school crosswalk.", "10-84": "Alternative code used for Estimated Time of Arrival.", "10-85": "Traffic, weather, or incident delaying arrival at destination.", "10-86": "Identifying or verifying the dispatcher/operator currently on duty.", "10-87": "Pick up or distribute checks (paperwork/payments).", "10-88": "Requesting a call-back phone number for a person or location.", "10-89": "Report of a bomb threat or suspicious explosive device.", "10-90": "Silent or audible alarm activated at a financial institution.", "10-91": "Transporting or picking up a prisoner/person in custody.", "10-92": "Vehicle parked in violation of parking laws or blocking access.", "10-93": "Roadblock or blockade is in place or being set up.", "10-94": "Street racing or illegal speed contest taking place.", "10-95": "Suspect or individual has been safely arrested or detained.", "10-96": "Subject is, or appears to be, mentally disturbed or in mental crisis.", "10-97": "Radio check to test signal clarity and transmission strength.", "10-98": "Inmate or suspect has escaped from custody or facility.", "10-99": "Query result showing subject is wanted on warrant or property is stolen."};
+const examplesData = {"10-0": "10-0 on that location, suspect has a history of violent behavior.", "10-1": "Control, your signal is 10-1, please repeat.", "10-2": "Unit 4, your signal is 10-2.", "10-3": "All units 10-3 for emergency broadcast.", "10-4": "10-4, heading to the scene now.", "10-5": "10-5 this message to Unit 12.", "10-6": "Unit 8 is 10-6 processing a report.", "10-7": "Unit 3 is 10-7 for meal break.", "10-8": "Unit 3 is back 10-8.", "10-9": "10-9 on your last location, say again.", "10-10": "10-10 at the intersection of Main and 5th.", "10-11": "10-11 involving a loose dog blocking traffic.", "10-12": "10-12 while I run this license plate.", "10-13": "All units, 10-13 on the North highway due to heavy rain.", "10-14": "10-14 reported at 402 Oak Street, rear backyard.", "10-15": "10-15 outside the downtown stadium.", "10-16": "10-16 reported at residence, raised voices heard.", "10-17": "Unit 5, 10-17 at the lobby of 123 Elm Street.", "10-18": "10-18, deliver paperwork to central station.", "10-19": "Unit 2, 10-19 when clear of your call.", "10-20": "Unit 7, what is your 10-20?", "10-21": "10-21 the station when you have a moment.", "10-22": "10-22 on that last request, false alarm.", "10-23": "Unit 4 is 10-23 at the scene.", "10-24": "10-24 at 5th Avenue, standing by.", "10-25": "10-25 the watch commander upon return.", "10-26": "10-26, holding one individual for identification.", "10-27": "Run a 10-27 on state ID 12345678.", "10-28": "10-28 on license plate ABC-1234.", "10-29": "10-29 on suspect name and DOB.", "10-30": "10-30 on frequency 2, clear the channel.", "10-31": "10-31 burglary at the convenience store.", "10-32": "10-32 reported near the alleyway.", "10-33": "10-33, officer needs assistance at 4th and Pine!", "10-34": "10-34 reported at central square.", "10-35": "10-35 broadcast, armed robbery suspect fleeing northbound.", "10-36": "Dispatch, what is the 10-36?", "10-37": "10-37 parked in dark lot with engine idling.", "10-38": "10-38 on silver sedan, license ABC-1234.", "10-39": "Unit 6, 10-39 to the injury crash.", "10-40": "10-40 approach to burglary in progress.", "10-41": "Unit 12 is 10-41, on duty.", "10-42": "Unit 12 is 10-42, off duty.", "10-43": "10-43 for all units regarding road closure on 2nd St.", "10-44": "Unit 5 requesting 10-44 for meal break.", "10-45": "10-45 in the right lane of Highway 10.", "10-46": "10-46 with disabled vehicle on shoulder.", "10-47": "10-47 required for large pothole causing flat tires.", "10-48": "10-48 at Main and 3rd, stop sign knocked down.", "10-49": "10-49 at Broadway and 3rd St.", "10-50": "10-50 two vehicles involved, unknown injuries.", "10-51": "Requesting 10-51 for stalled vehicle.", "10-52": "Send 10-52 for injured passenger.", "10-53": "10-53 on main bridge due to fallen tree.", "10-54": "10-54 reported on County Road 5.", "10-55": "10-55 weaving between lanes on I-95.", "10-56": "10-56 staggering along sidewalk.", "10-57": "10-57 involving parked car, suspect vehicle fled east.", "10-58": "Unit 3 10-58 due to signal malfunction.", "10-59": "Unit 4 assigned to 10-59 parade route.", "10-60": "10-60 in area searching for runaway juvenile.", "10-61": "10-61 downtown, officers already in the area.", "10-62": "Unit 2, 10-62 on previous inquiry.", "10-63": "Unit 7, 10-63 for suspect description.", "10-64": "10-64 regarding missing keys found at station.", "10-65": "10-65 issued for amber alert.", "10-66": "10-66 on the suspect bolo.", "10-67": "Channel is 10-67 for state transmission.", "10-68": "10-68 regarding updated caller details.", "10-69": "10-69 on your last transmission.", "10-70": "10-70 triggered at high school building.", "10-71": "Unit 1, 10-71 for 120 Main Street.", "10-72": "Control, 10-72 on structural fire.", "10-73": "10-73 reported near industrial park.", "10-74": "10-74, suspect is not at location.", "10-75": "Unit 6 is 10-75 with vehicle owner.", "10-76": "Unit 8 is 10-76 to 5th Street.", "10-77": "What is your 10-77 to scene?", "10-78": "10-78, officer needs additional units!", "10-79": "10-79 required at scene of fatal crash.", "10-80": "10-80 northbound on Route 1, high speeds.", "10-81": "10-81 complete, subject over legal limit.", "10-82": "10-82 for two officers working the festival detail.", "10-83": "Unit 5 on 10-83 duty at Elementary School.", "10-84": "10-84 is 5 minutes.", "10-85": "10-85 due to heavy highway traffic.", "10-86": "Dispatcher 4 is 10-86.", "10-87": "10-87 at the municipal office, pick up payroll checks.", "10-88": "10-88 for complainant.", "10-89": "10-89 reported at civic center.", "10-90": "10-90 triggered at First National Bank.", "10-91": "10-91 from precinct 2 to central holding.", "10-92": "10-92 blocking fire hydrant.", "10-93": "10-93 on Route 9 at the county line.", "10-94": "10-94 reported on back country road.", "10-95": "10-95, one adult male detained.", "10-96": "10-96 reported at the bus terminal, subject is confused and agitated.", "10-97": "10-97, radio check.", "10-98": "10-98 from county jail, all units respond.", "10-99": "10-99 returned on license plate check."};
 
 let questionKeys = [], currentIndex = 0, mistakes = 0, firstTryCorrect = true, isCorrect = false, currentMode = '';
+let targetQuestionCount = 10;
+let chartInstance = null;
 
 function switchTab(id) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     document.getElementById('tab-' + id).classList.add('active');
     document.getElementById(id).classList.add('active');
-    if(id === 'study') renderManual();
+    if (id === 'stats') renderStatsTab();
+}
+
+function renderStatsTab() {
+    renderManual();
+    const history = JSON.parse(localStorage.getItem('quizHistory') || '[]');
+    const stats   = JSON.parse(localStorage.getItem('codeStats')   || '{}');
+    const totalSessions = history.length;
+    const avgScore = totalSessions > 0 ? Math.round(history.reduce((a, b) => a + b.score, 0) / totalSessions) : 0;
+    const allCodes = Object.keys(codesData);
+    let masteredCount = 0;
+    allCodes.forEach(code => {
+        const s = stats[code];
+        if (s && s.q > 0 && ((s.r / s.q) >= 0.8)) masteredCount++;
+    });
+    document.getElementById('stat-total-sessions').textContent = totalSessions;
+    document.getElementById('stat-avg-score').textContent      = avgScore + '%';
+    document.getElementById('stat-mastered-codes').textContent = `${masteredCount} / 100`;
+
+    const canvas = document.getElementById('progress-chart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const labels     = history.map((h, i) => h.timestamp || `Session ${i + 1}`);
+    const dataScores = history.map(h => h.score);
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.length > 0 ? labels : ['No Drills Yet'],
+            datasets: [{
+                label: 'Accuracy (%)',
+                data: dataScores.length > 0 ? dataScores : [0],
+                borderColor: '#1a73e8',
+                backgroundColor: 'rgba(26, 115, 232, 0.15)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.35,
+                pointRadius: dataScores.length > 0 ? 4 : 0,
+                pointBackgroundColor: '#34a853',
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 0, max: 100,
+                    grid: { color: '#2a2a2a' },
+                    ticks: { color: '#888', callback: v => v + '%' }
+                },
+                x: {
+                    grid: { color: '#222' },
+                    ticks: { color: '#888', maxRotation: 45, minRotation: 0, font: { size: 10 } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1a1a1a',
+                    titleColor: '#fff',
+                    bodyColor: '#34a853',
+                    borderColor: '#333',
+                    borderWidth: 1,
+                    callbacks: { label: context => ` Accuracy: ${context.raw}%` }
+                }
+            }
+        }
+    });
 }
 
 function renderManual() {
     const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
     const tbody = document.getElementById('manual-body');
     tbody.innerHTML = '';
-    
     Object.keys(codesData).forEach(code => {
         const s = stats[code] || { q: 0, r: 0, last: null };
         const mastery = s.q > 0 ? Math.round((s.r / s.q) * 100) : 0;
-        const lastTag = s.last === 'c' ? '<span class="status-tag tag-correct">COR</span>' : (s.last === 'w' ? '<span class="status-tag tag-wrong">WRG</span>' : '-');
+        const lastTag = s.last === 'c'
+            ? '<span class="status-tag tag-correct">COR</span>'
+            : (s.last === 'w' ? '<span class="status-tag tag-wrong">WRG</span>' : '-');
         tbody.innerHTML += `<tr><td class="code-col">${code}</td><td>${codesData[code]}</td><td class="stat-val">${s.q}</td><td class="stat-val">${mastery}%</td><td class="stat-val">${lastTag}</td></tr>`;
     });
 }
@@ -163,51 +300,53 @@ let flashcardPool = [], flashcardIndex = 0, flashcardFlipped = false, flashcardM
 function startFlashcards(mode) {
     flashcardMode = mode;
     const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
-    
-    // Get all codes that have been quizzed
     const quizzedCodes = Object.keys(codesData).filter(code => {
         const s = stats[code];
         return s && s.q > 0;
     });
-    
-    // If no quizzed codes, use all codes
     if (quizzedCodes.length === 0) {
         flashcardPool = Object.keys(codesData).sort(() => 0.5 - Math.random());
     } else {
-        // Sort by mastery (lowest first) so weak codes are prioritized
         flashcardPool = quizzedCodes.sort((a, b) => {
             const masteryA = Math.round((stats[a].r / stats[a].q) * 100);
             const masteryB = Math.round((stats[b].r / stats[b].q) * 100);
             return masteryA - masteryB;
         });
     }
-    
     flashcardIndex = 0;
     document.getElementById('study-table-view').style.display = 'none';
-    document.getElementById('flashcard-view').style.display = 'block';
+    document.getElementById('flashcard-view').style.display   = 'block';
     loadFlashcard();
 }
 
 function loadFlashcard() {
-    const code = flashcardPool[flashcardIndex];
+    const code    = flashcardPool[flashcardIndex];
     const meaning = codesData[code];
     flashcardFlipped = false;
-    
-    // Show code or meaning based on mode
     const initialTerm = flashcardMode === 'code' ? code : meaning;
     document.getElementById('flashcard-term').textContent = initialTerm;
+    document.getElementById('flashcard-details').style.display = 'none';
+    document.getElementById('flashcard-hint').textContent = 'Tap to flip';
 }
 
 function flipFlashcard() {
-    const code = flashcardPool[flashcardIndex];
+    const code    = flashcardPool[flashcardIndex];
     const meaning = codesData[code];
+    const expText = explanationsData[code] || '';
+    const exText  = examplesData[code]     || '';
     flashcardFlipped = !flashcardFlipped;
-    
-    // Flip between code and meaning based on mode
-    if (flashcardMode === 'code') {
-        document.getElementById('flashcard-term').textContent = flashcardFlipped ? meaning : code;
+    if (flashcardFlipped) {
+        const backTerm = flashcardMode === 'code' ? meaning : `${code} — ${meaning}`;
+        document.getElementById('flashcard-term').textContent = backTerm;
+        document.getElementById('flashcard-explanation').textContent = expText;
+        document.getElementById('flashcard-example').textContent     = exText ? `Example: "${exText}"` : '';
+        document.getElementById('flashcard-details').style.display   = 'block';
+        document.getElementById('flashcard-hint').textContent = 'Tap to flip back';
     } else {
-        document.getElementById('flashcard-term').textContent = flashcardFlipped ? code : meaning;
+        const initialTerm = flashcardMode === 'code' ? code : meaning;
+        document.getElementById('flashcard-term').textContent = initialTerm;
+        document.getElementById('flashcard-details').style.display = 'none';
+        document.getElementById('flashcard-hint').textContent = 'Tap to flip';
     }
 }
 
@@ -216,73 +355,86 @@ function nextFlashcard() {
     if (flashcardIndex < flashcardPool.length) {
         loadFlashcard();
     } else {
-        // Loop back to start
         flashcardIndex = 0;
         loadFlashcard();
     }
 }
 
 function exitFlashcards() {
-    document.getElementById('flashcard-view').style.display = 'none';
+    document.getElementById('flashcard-view').style.display   = 'none';
     document.getElementById('study-table-view').style.display = 'block';
 }
 
 function startQuiz(mode) {
     currentMode = mode; mistakes = 0; currentIndex = 0;
     const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
-    const all = Object.keys(codesData);
-    
-    let neverQuizzed = all.filter(c => !stats[c] || stats[c].q === 0).sort(() => 0.5 - Math.random());
-    let selectedCodes = neverQuizzed.slice(0, 25);
-    
-    if (selectedCodes.length < 25) {
-        const remaining = 25 - selectedCodes.length;
-        const seenPool = all.filter(c => !selectedCodes.includes(c)).sort(() => 0.5 - Math.random());
-        selectedCodes = selectedCodes.concat(seenPool.slice(0, remaining));
+    const all   = Object.keys(codesData);
+    let neverQuizzed  = all.filter(c => !stats[c] || stats[c].q === 0).sort(() => 0.5 - Math.random());
+    let selectedCodes = neverQuizzed.slice(0, targetQuestionCount);
+    if (selectedCodes.length < targetQuestionCount) {
+        const remaining = targetQuestionCount - selectedCodes.length;
+        const seenPool  = all.filter(c => !selectedCodes.includes(c)).sort(() => 0.5 - Math.random());
+        selectedCodes   = selectedCodes.concat(seenPool.slice(0, remaining));
     }
-
     questionKeys = (mode === 'code') ? selectedCodes : selectedCodes.map(c => codesData[c]);
-    document.getElementById('start-screen').style.display = "none";
-    document.getElementById('page-title').style.display = "none";
-    document.getElementById('quiz-ui').style.display = "block";
-    document.getElementById('coffee-button').style.display = "none"; // HIDE BUTTON
+    document.getElementById('start-screen').style.display    = 'none';
+    document.getElementById('page-title').style.display      = 'none';
+    document.getElementById('quiz-ui').style.display         = 'block';
+    document.getElementById('coffee-button').style.display   = 'none';
     loadQuestion();
 }
 
 function loadQuestion() {
-    const target = questionKeys[currentIndex];
+    const target     = questionKeys[currentIndex];
     const correctAns = (currentMode === 'code') ? codesData[target] : meaningsData[target];
     const actualCode = (currentMode === 'code') ? target : correctAns;
-    
-    document.getElementById('target-term').textContent = target;
-    document.getElementById('feedback').textContent = "";
-    document.getElementById('next-btn').style.display = "none";
+
+    document.getElementById('target-term').textContent       = target;
+    document.getElementById('feedback').textContent          = '';
+    document.getElementById('next-btn').style.display        = 'none';
     isCorrect = false;
     firstTryCorrect = true;
 
-    const fullPool = (currentMode === 'code') ? Object.values(codesData) : Object.keys(codesData);
+    const fullPool    = (currentMode === 'code') ? Object.values(codesData) : Object.keys(codesData);
     const distractors = fullPool.filter(v => v !== correctAns).sort(() => 0.5 - Math.random()).slice(0, 3);
-    const choices = [...distractors, correctAns].sort(() => 0.5 - Math.random());
+    const choices     = [...distractors, correctAns].sort(() => 0.5 - Math.random());
 
     const grid = document.getElementById('options-grid');
-    grid.innerHTML = "";
+    grid.innerHTML = '';
     choices.forEach(c => {
         const b = document.createElement('button');
-        b.textContent = c; b.className = "option-btn";
+        b.className = 'option-btn';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'option-title';
+        titleDiv.textContent = c;
+        b.appendChild(titleDiv);
+
         b.onclick = () => {
-            if(isCorrect) return;
+            if (isCorrect) return;
             const stats = JSON.parse(localStorage.getItem('codeStats') || '{}');
-            if(!stats[actualCode]) stats[actualCode] = { q: 0, r: 0, last: null };
-            
-            if(c === correctAns) {
-                isCorrect = true; b.classList.add('correct');
+            if (!stats[actualCode]) stats[actualCode] = { q: 0, r: 0, last: null };
+            if (c === correctAns) {
+                isCorrect = true;
+                b.classList.add('correct');
+                document.querySelectorAll('.option-btn').forEach(opt => opt.disabled = true);
                 stats[actualCode].q++;
-                if(firstTryCorrect) { stats[actualCode].r++; stats[actualCode].last = 'c'; } 
+                if (firstTryCorrect) { stats[actualCode].r++; stats[actualCode].last = 'c'; }
                 else { stats[actualCode].last = 'w'; }
                 localStorage.setItem('codeStats', JSON.stringify(stats));
-                document.getElementById('next-btn').style.display = "block";
+
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'option-details';
+                const expText = explanationsData[actualCode] || '';
+                const exText  = examplesData[actualCode]     || '';
+                let detailsHTML = '';
+                if (expText) detailsHTML += `<div class="option-explanation">${expText}</div>`;
+                if (exText)  detailsHTML += `<div class="option-example">Example: "${exText}"</div>`;
+                detailsDiv.innerHTML = detailsHTML;
+                b.appendChild(detailsDiv);
+                document.getElementById('next-btn').style.display = 'block';
             } else {
-                if(firstTryCorrect) { mistakes++; }
+                if (firstTryCorrect) mistakes++;
                 firstTryCorrect = false;
                 b.classList.add('wrong');
                 b.disabled = true;
@@ -294,18 +446,38 @@ function loadQuestion() {
 
 function nextQuestion() {
     currentIndex++;
-    document.getElementById('progress-bar').style.width = (currentIndex / 25) * 100 + "%";
-    if(currentIndex < 25) { loadQuestion(); window.scrollTo(0,0); }
-    else {
-        document.getElementById('quiz-ui').style.display = "none";
-        document.getElementById('stats-screen').style.display = "block";
-        document.getElementById('session-score').textContent = Math.round(((25 - mistakes) / 25) * 100) + "%";
-        document.getElementById('mistake-count').textContent = mistakes + " First-Try Mistakes";
-        document.getElementById('coffee-button').style.display = "block"; // SHOW BUTTON AGAIN
+    document.getElementById('progress-bar').style.width = (currentIndex / targetQuestionCount) * 100 + '%';
+    if (currentIndex < targetQuestionCount) {
+        loadQuestion();
+        window.scrollTo(0, 0);
+    } else {
+        const sessionScore = Math.round(((targetQuestionCount - mistakes) / targetQuestionCount) * 100);
+        const history = JSON.parse(localStorage.getItem('quizHistory') || '[]');
+        history.push({
+            timestamp: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            date: new Date().toISOString(),
+            score: sessionScore,
+            questions: targetQuestionCount,
+            mistakes: mistakes,
+            mode: currentMode
+        });
+        if (history.length > 50) history.shift();
+        localStorage.setItem('quizHistory', JSON.stringify(history));
+
+        document.getElementById('quiz-ui').style.display      = 'none';
+        document.getElementById('stats-screen').style.display = 'block';
+        document.getElementById('session-score').textContent  = sessionScore + '%';
+        document.getElementById('mistake-count').textContent  = mistakes + ' First-Try Mistakes';
+        document.getElementById('coffee-button').style.display = 'block';
     }
 }
 
-function clearData() { if(confirm("Delete all history and stats?")) { localStorage.clear(); location.reload(); } }
+function doReset() {
+    localStorage.removeItem('codeStats');
+    localStorage.removeItem('quizHistory');
+    location.reload();
+}
+function clearData() { doReset(); }
 </script>
 </body>
 </html>
